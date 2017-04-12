@@ -46,8 +46,8 @@
          <bottom>
             <ToolBar fx:id="toolbar" prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
               <items>
-                  <JFXButton fx:id="resetButton" text="Reset" translateX="250.0" />
-                  <JFXButton fx:id="goButton" text="Go" translateX="300.0" />
+                  <JFXButton fx:id="resetButton" text="Reset" translateX="300.0" />
+                  <JFXButton fx:id="goButton" text="Go" translateX="350.0" />
               </items>
             </ToolBar>
          </bottom>

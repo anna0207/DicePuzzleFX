@@ -6,8 +6,11 @@ import javafx.scene.shape.StrokeType;
 
 public class Dice extends Rectangle {
 
+	private int row;
+	
 	public Dice(int row, int column) {
 		super();
+		this.row = row;
 		
 		this.setHeight(50);
 		this.setWidth(50);
@@ -18,6 +21,10 @@ public class Dice extends Rectangle {
 		this.setStrokeType(StrokeType.INSIDE);
 		GridPane.setRowIndex(this, row);
 		GridPane.setColumnIndex(this, column);
+	}
+	
+	public int getIndexRow() {
+		return 4 - ((row + 1) / 2);
 	}
 	
 }

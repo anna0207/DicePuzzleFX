@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXButton.ButtonType;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -14,6 +15,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
+import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
 
 public class DiceController implements Initializable {
@@ -24,9 +26,43 @@ public class DiceController implements Initializable {
 	private JFXButton goButton, resetButton;
 
 	private List<Rectangle> chosenRecs;
+	private AIPlayer ai;
 	
 	public DiceController() {
 		chosenRecs = new ArrayList<>();
+		ai = new AIPlayer();
+	}
+	
+	private void nextMove() {
+		int current = thisMove();
+		int next = ai.nextMove(current); 
+		
+		for (int row = 3; row >= 0; row--) {
+			int number = 0;
+			for (Node node : diceGridPane.getChildren()) {
+				Dice dice = (Dice) node;
+				if (dice.getIndexRow() == row) {
+					number++;
+					if (number > ((next / Math.pow(10, row)) % 10)) {
+						chosenRecs.add(dice);
+					}
+				}
+			}
+		}
+		
+		diceGridPane.getChildren().removeAll(chosenRecs);
+		chosenRecs.clear();
+	}
+	
+	private int thisMove() {
+		int move = 0;
+		List<Node> dices = diceGridPane.getChildren();
+		for (Node node : dices) {
+			Dice dice = (Dice) node;
+			move += Math.pow(10, dice.getIndexRow());
+		}
+		return move;
+		
 	}
 	
 	private void clear(Rectangle rec) {
@@ -54,19 +90,14 @@ public class DiceController implements Initializable {
 				clear((Rectangle)otherRec);
 			}
 		}
-		print();
-	}
-	
-	private void print() {
-		System.out.println("diceGridPane: " + diceGridPane.getChildren().size());
-		System.out.println("chosenRecs: " + chosenRecs.size());
 	}
 	
 	@FXML
 	private void handleContinue(ActionEvent event) {
 		diceGridPane.getChildren().removeAll(chosenRecs);
 		chosenRecs.clear();
-		print();
+		
+		nextMove();
 	}
 	
 	@FXML
@@ -90,24 +121,23 @@ public class DiceController implements Initializable {
 			});
 		}
 		chosenRecs.clear();
-		print();
 	}
 	
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
 		resetDices();
-		
+	
 		goButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
 				handleContinue(event);
 			}
 		});
-		
+
 		resetButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				initialize(arg0, arg1);
+				resetDices();
 			}
 		});
 		
