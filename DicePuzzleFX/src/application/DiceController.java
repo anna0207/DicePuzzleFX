@@ -34,35 +34,46 @@ public class DiceController implements Initializable {
 	}
 	
 	private void nextMove() {
-		int current = thisMove();
-		int next = ai.nextMove(current); 
-		
-		for (int row = 3; row >= 0; row--) {
-			int number = 0;
-			for (Node node : diceGridPane.getChildren()) {
-				Dice dice = (Dice) node;
-				if (dice.getIndexRow() == row) {
-					number++;
-					if (number > ((next / Math.pow(10, row)) % 10)) {
-						chosenRecs.add(dice);
+		try {
+			Move current = thisMove();
+			System.out.println("current: " + current.toString());
+			Move next = ai.nextMove(current); 
+			
+			for (int row = 3; row >= 0; row--) {
+				int number = 0;
+				for (Node node : diceGridPane.getChildren()) {
+					Dice dice = (Dice) node;
+					if (dice.getIndexRow() == row) {
+						number++;
+						if (number > next.getByRow(row + 1)) {
+							chosenRecs.add(dice);
+						}
 					}
 				}
 			}
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			e.printStackTrace();
 		}
-		
+			
 		diceGridPane.getChildren().removeAll(chosenRecs);
 		chosenRecs.clear();
 	}
 	
-	private int thisMove() {
-		int move = 0;
+	private Move thisMove() {
+		Move move = new Move(0,0,0,0);
 		List<Node> dices = diceGridPane.getChildren();
 		for (Node node : dices) {
-			Dice dice = (Dice) node;
-			move += Math.pow(10, dice.getIndexRow());
+			try {
+				Dice dice = (Dice) node;
+				int rowDices = move.getByRow(dice.getIndexRow() + 1);
+				move.setRow(dice.getIndexRow() + 1, rowDices + 1);
+			} catch (Exception e) {
+				System.out.println(e.getMessage());
+				e.printStackTrace();
+			}
 		}
 		return move;
-		
 	}
 	
 	private void clear(Rectangle rec) {

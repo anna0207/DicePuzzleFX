@@ -1,5 +1,6 @@
 package application;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Move {
@@ -13,10 +14,20 @@ public class Move {
 		dices[1] = second;
 		dices[2] = third;
 		dices[3] = fourth;
+		
+		next = new ArrayList<>();
 	}
 	
 	public int getByRow(int index) {
 		return dices[index - 1];
+	}
+	
+	public void setRow(int index, int value) throws Exception {
+		if (index > 0 && index < 5) {
+			dices[index - 1] = value;
+		} else {
+			throw new Exception("Index out of bounds");
+		}
 	}
 	
 	public void addNext(Move move) {
@@ -27,10 +38,26 @@ public class Move {
 		return next;
 	}
 
-	public boolean equals(Move move) {
-		return move.getByRow(1) == dices[0] &&
+	@Override
+	public boolean equals(Object object) {
+		if (object instanceof Move) {
+			Move move = (Move)object;
+			return move.getByRow(1) == dices[0] &&
 				move.getByRow(2) == dices[1] &&
 				move.getByRow(3) == dices[2] &&
 				move.getByRow(4) == dices[3];
+		} else {
+			return false;
+		}
+		
+	}
+	
+	public boolean isNotZero() {
+		return (dices[0] + dices[1] + dices[2] + dices[3]) > 0;
+	}
+	
+	@Override
+	public String toString() {
+		return "" + dices[0] + dices[1] + dices[2] + dices[3];
 	}
 }

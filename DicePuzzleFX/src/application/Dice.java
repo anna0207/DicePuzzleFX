@@ -24,7 +24,7 @@ public class Dice extends Rectangle {
 	}
 	
 	public int getIndexRow() {
-		return 4 - ((row + 1) / 2);
+		return row / 2;
 	}
 	
 }
