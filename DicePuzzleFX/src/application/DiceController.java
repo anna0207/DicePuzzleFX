@@ -16,6 +16,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
+import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Paint;
@@ -26,7 +27,9 @@ public class DiceController implements Initializable {
 	@FXML
 	private GridPane diceGridPane;
 	@FXML
-	private JFXButton goButton, resetButton;
+	private JFXButton goButton, resetButton, easyButton, difficultButton;
+	@FXML
+	private Label displayLabel;
 
 	private ObservableList<Rectangle> chosenRecs;
 	private AIPlayer ai;
@@ -39,9 +42,8 @@ public class DiceController implements Initializable {
 	private void nextMove() {
 		try {
 			Move current = thisMove();
-			System.out.println("current: " + current.toString());
 			Move next = ai.nextMove(current); 
-			
+			System.out.println(current.toString() + " + " + next.toString());
 			for (int row = 3; row >= 0; row--) {
 				int number = 0;
 				for (Node node : diceGridPane.getChildren()) {
@@ -61,6 +63,9 @@ public class DiceController implements Initializable {
 			
 		diceGridPane.getChildren().removeAll(chosenRecs);
 		chosenRecs.clear();
+		if (diceGridPane.getChildren().isEmpty()) {
+			displayLabel.setText("Sorry. You lost! Try again");
+		}
 	}
 	
 	private Move thisMove() {
@@ -111,7 +116,11 @@ public class DiceController implements Initializable {
 		diceGridPane.getChildren().removeAll(chosenRecs);
 		chosenRecs.clear();
 		
-		nextMove();
+		if (diceGridPane.getChildren().isEmpty()) {
+			displayLabel.setText("Wuhu You Won");
+		} else {
+			nextMove();
+		}
 	}
 	
 	@FXML
@@ -135,11 +144,16 @@ public class DiceController implements Initializable {
 			});
 		}
 		chosenRecs.clear();
+		easyButton.setDisable(false);
+		difficultButton.setDisable(false);
+		displayLabel.setText("Try beat the computer");
 	}
 	
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
 		resetDices();
+		
+		displayLabel.setTextFill(javafx.scene.paint.Color.DARKGREY);
 		
 		goButton.disableProperty().bind(Bindings.isEmpty(chosenRecs));
 		goButton.setOnAction(new EventHandler<ActionEvent>() {
@@ -153,6 +167,26 @@ public class DiceController implements Initializable {
 			@Override
 			public void handle(ActionEvent event) {
 				resetDices();
+			}
+		});
+		
+		easyButton.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				ai.setDifficulty(Difficulty.EASY);
+				nextMove();
+				easyButton.setDisable(true);
+				difficultButton.setDisable(true);
+			}
+		});
+		
+		difficultButton.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				ai.setDifficulty(Difficulty.DIFFICULT);
+				nextMove();
+				easyButton.setDisable(true);
+				difficultButton.setDisable(true);
 			}
 		});
 		

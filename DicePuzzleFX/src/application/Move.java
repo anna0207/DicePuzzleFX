@@ -24,9 +24,13 @@ public class Move {
 	
 	public void setRow(int index, int value) throws Exception {
 		if (index > 0 && index < 5) {
-			dices[index - 1] = value;
+			if (value >= 0 && value <= (index * 2) - 1) {
+				dices[index - 1] = value;
+			} else {
+				throw new Exception("Invalid value " + value + " in row " + index);
+			}
 		} else {
-			throw new Exception("Index out of bounds");
+			throw new Exception("Row " + index + " out of bounds");
 		}
 	}
 	

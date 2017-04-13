@@ -7,6 +7,7 @@
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.control.Label?>
 
 <AnchorPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.DiceController">
    <children>
@@ -46,8 +47,11 @@
          <bottom>
             <ToolBar fx:id="toolbar" prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
               <items>
-                  <JFXButton fx:id="resetButton" text="Reset" translateX="300.0" />
-                  <JFXButton fx:id="goButton" text="Go" translateX="350.0" />
+                  <JFXButton fx:id="resetButton" text="Reset" translateX="200.0" />
+                  <JFXButton fx:id="goButton" text="Go" translateX="250.0" />
+                  <JFXButton fx:id="easyButton" text="Easy" translateX="300" />
+                  <JFXButton fx:id="difficultButton" text="Difficult" translateX="350" />
+                  <Label fx:id="displayLabel" text="Try beat the computer" translateX="400" />
               </items>
             </ToolBar>
          </bottom>

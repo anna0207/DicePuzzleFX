@@ -14,20 +14,39 @@ public class AIPlayer {
 	private List<Move> moves;
 	private List<Move> wins;
 	private Move goal;
+	private Difficulty difficulty;
+	private boolean firstMove;
 	
 	public AIPlayer() {
 		moves = new ArrayList<Move>();
 		wins = new ArrayList<Move>();
 		goal = new Move(0,0,0,0);
 		moves.add(goal);
+		difficulty = Difficulty.EASY;
+		firstMove = true;
 		
 		readWins();
 		readMoves();
 	}
 	
+	public void setDifficulty(Difficulty difficulty) {
+		this.difficulty = difficulty;
+		this.firstMove = true;
+	}
+	
 	public Move nextMove(Move move) throws Exception {
 		Random rand = new Random();
 		Move next = null;
+		if (difficulty == Difficulty.DIFFICULT && firstMove) {
+			int row = rand.nextInt(4) + 1;
+			int value = move.getByRow(row);
+			Move ranMove = move.copy();
+			ranMove.setRow(row, --value);
+			firstMove = false;
+			return ranMove;
+		}
+		firstMove = false;
+		
 		for (Move temp : moves) {
 			if (temp.equals(move)) {
 				next = temp;
@@ -40,35 +59,21 @@ public class AIPlayer {
 		if (nextMoves.size() > 0) {
 			int index = rand.nextInt(nextMoves.size());
 			return nextMoves.get(index);
-		} 
-		throw new Exception("No next moves");
+		} else {
+			return getNextMove(next);
+		}
 	}	
 	
-	public boolean addCheck(Move fromMove, Move toMove) {
-		List<Move> illegal = new ArrayList<>();
-		illegal.add(new Move(0,3,4,6));
-		illegal.add(new Move(1,2,4,6));
-		illegal.add(new Move(0,2,5,6));
-		illegal.add(new Move(0,2,4,7));
-		
-		for (Move next : fromMove.getNextMoves()) {
-			if (next.equals(toMove)) {
-				return false;
-			} else if (!toMove.isNotZero()) {
-				if (illegal.contains(fromMove)) {
-					return false;
-				}
-			}
-		}
-		return true;
-	}
-	
 	public Move getNextMove(Move move) {
+		Move randomMove = null;
+		Random random = new Random();
+		int rCount = random.nextInt(move.getByRow(1) + move.getByRow(2) + move.getByRow(3) + move.getByRow(4));
+		int count = 0;
 		Move tempMove = move.copy();
 		for (int i = 1; i <= 4; i++) {
 			int temp = tempMove.getByRow(i);
 			while (temp > 0) {
-				temp -= 1;
+				temp--;
 				try {
 					tempMove.setRow(i, temp);
 					for (Move win : wins) {
@@ -77,14 +82,19 @@ public class AIPlayer {
 							return tempMove;
 						}
 					}
+					if (count == rCount) {
+						randomMove = tempMove;
+					}
 				} catch (Exception e) {
 					System.out.println(e.getMessage());
 					e.printStackTrace();
 				}
+				count++;
 			}
 			tempMove = move.copy();
 		}
-		return null;
+		
+		return randomMove;
 	}
 	
 	private void readWins() {
@@ -140,7 +150,6 @@ public class AIPlayer {
 				}
 				line = reader.readLine();
 			}
-			System.out.println("total: " + moves.size());
 			
 		} catch (IOException e) {
 			System.out.println(e.getMessage());
