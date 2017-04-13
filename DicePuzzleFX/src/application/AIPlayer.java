@@ -13,10 +13,14 @@ public class AIPlayer {
  
 	private List<Move> moves;
 	private List<Move> wins;
+	private Move goal;
 	
 	public AIPlayer() {
 		moves = new ArrayList<Move>();
 		wins = new ArrayList<Move>();
+		goal = new Move(0,0,0,0);
+		moves.add(goal);
+		
 		readWins();
 		readMoves();
 	}
@@ -30,7 +34,7 @@ public class AIPlayer {
 			}
 		}
 		if (next == null) {
-			throw new Exception("current move does not exist in moves list");
+			return getNextMove(move);
 		}
 		List<Move> nextMoves = next.getNextMoves();
 		if (nextMoves.size() > 0) {
@@ -59,18 +63,18 @@ public class AIPlayer {
 		return true;
 	}
 	
-	public Move findWinningMove(Move move) {
-		int index = 0;
-		Move tempMove = move;
+	public Move getNextMove(Move move) {
+		Move tempMove = move.copy();
 		for (int i = 1; i <= 4; i++) {
-			int temp = move.getByRow(i);
+			int temp = tempMove.getByRow(i);
 			while (temp > 0) {
 				temp -= 1;
 				try {
 					tempMove.setRow(i, temp);
 					for (Move win : wins) {
 						if (tempMove.equals(win)) {
-							return win;
+							move.addNext(tempMove);
+							return tempMove;
 						}
 					}
 				} catch (Exception e) {
@@ -78,6 +82,7 @@ public class AIPlayer {
 					e.printStackTrace();
 				}
 			}
+			tempMove = move.copy();
 		}
 		return null;
 	}
@@ -92,43 +97,8 @@ public class AIPlayer {
 				line = reader.readLine();
 			}
 		} catch (IOException e) {
-			System.out.println(e.getMessage());
+			System.out.println(e.getMessage()); 
 			e.printStackTrace();
-		}
-		
-	}
-	
-	public void addWinningMoves(Move move) {
-		int temp = 0;
-		Move res = null;
-		Move tempMove = move;
-		for (int i = 1; i <= 4; i++) {
-			temp = tempMove.getByRow(i);
-			while (temp > 0) {
-				temp -= 1;
-				try {
-					tempMove.setRow(i, temp);
-					for (Move win : wins) {
-						if (tempMove.equals(win)) {
-							System.out.println("found: " + win.toString());
-							res = win;
-						}
-					}
-					if (res == null) {
-						addWinningMoves(tempMove);
-					}
-					if (res != null && addCheck(tempMove, res)) {
-						tempMove.addNext(res);
-						moves.add(res);
-					}
-					if (tempMove.isNotZero()) {
-						addWinningMoves(res);
-					}
-				} catch (Exception e) {
-					System.out.println(e.getMessage());
-					e.printStackTrace();
-				}
-			}
 		}
 		
 	}
@@ -145,35 +115,32 @@ public class AIPlayer {
 			while (line != null) {
 				String[] edge = line.split(" ");
 				int from = Integer.parseInt(edge[0]);
-				if (edge.length == 1) {
-					addWinningMoves(new Move(from/1000, (from/100)%10, (from/10)%10, from%10));
-				} else {
-					int to = Integer.parseInt(edge[1]);
-					
-					Move toMove = new Move(to/1000, (to/100)%10, (to/10)%10, to%10);
-					Move fromMove = new Move(from/1000, (from/100)%10, (from/10)%10, from%10);
-					boolean fromExists = false;
-					boolean toExists = false;
-					for (Move move : moves) {
-						if (move.equals(fromMove)) {
-							fromExists = true;
-							fromMove = move;
-						} else if (move.equals(toMove)) {
-							toExists = true;
-							toMove = move;
-						}
+				int to = Integer.parseInt(edge[1]);
+				
+				Move toMove = new Move(to/1000, (to/100)%10, (to/10)%10, to%10);
+				Move fromMove = new Move(from/1000, (from/100)%10, (from/10)%10, from%10);
+				boolean fromExists = false;
+				boolean toExists = false;
+				for (Move move : moves) {
+					if (move.equals(fromMove)) {
+						fromExists = true;
+						fromMove = move;
+					} else if (move.equals(toMove)) {
+						toExists = true;
+						toMove = move;
 					}
-					fromMove.addNext(toMove);
-					
-					if (!fromExists) {
-						moves.add(fromMove);
-					}
-					if (!toExists) {
-						moves.add(toMove);
-					}
+				}
+				fromMove.addNext(toMove);
+				
+				if (!fromExists) {
+					moves.add(fromMove);
+				}
+				if (!toExists) {
+					moves.add(toMove);
 				}
 				line = reader.readLine();
 			}
+			System.out.println("total: " + moves.size());
 			
 		} catch (IOException e) {
 			System.out.println(e.getMessage());

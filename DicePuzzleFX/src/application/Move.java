@@ -60,4 +60,8 @@ public class Move {
 	public String toString() {
 		return "" + dices[0] + dices[1] + dices[2] + dices[3];
 	}
+	
+	public Move copy() {
+		return new Move(dices[0], dices[1], dices[2], dices[3]);
+	}
 }

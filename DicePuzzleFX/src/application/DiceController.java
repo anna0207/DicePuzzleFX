@@ -8,6 +8,9 @@ import java.util.ResourceBundle;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXButton.ButtonType;
 
+import javafx.beans.binding.Bindings;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -25,11 +28,11 @@ public class DiceController implements Initializable {
 	@FXML
 	private JFXButton goButton, resetButton;
 
-	private List<Rectangle> chosenRecs;
+	private ObservableList<Rectangle> chosenRecs;
 	private AIPlayer ai;
 	
 	public DiceController() {
-		chosenRecs = new ArrayList<>();
+		chosenRecs = FXCollections.observableArrayList();
 		ai = new AIPlayer();
 	}
 	
@@ -137,7 +140,8 @@ public class DiceController implements Initializable {
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
 		resetDices();
-	
+		
+		goButton.disableProperty().bind(Bindings.isEmpty(chosenRecs));
 		goButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
